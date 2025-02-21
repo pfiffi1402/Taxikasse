@@ -155,7 +155,30 @@
             `;
         }
 
-        function exportPDF() { const { jsPDF } = window.jspdf; let pdf = new jsPDF(); pdf.text("Taxi-Kasse - Übersicht", 10, 10); let totalBar = 0, totalEC = 0; einnahmen.forEach(entry => { totalBar += entry.summe; totalEC += entry.ecZahlung; }); let gesamtEinnahmen = totalBar + totalEC; pdf.autoTable({ head: [["Datum", "Summe (€)", "Gegeben (€)", "Rückgeld (€)", "Trinkgeld (€)", "EC (€)", "Einnahmen (€)"]], body: einnahmen.map(entry => [ entry.timestamp, entry.summe.toFixed(2), entry.gegeben.toFixed(2), entry.rueckgeld.toFixed(2), entry.trinkgeld.toFixed(2), entry.ecZahlung.toFixed(2), entry.einnahme.toFixed(2) ]) }); pdf.text(`Gesamteinnahmen: ${gesamtEinnahmen.toFixed(2)}€`, 10, pdf.lastAutoTable.finalY + 10); pdf.save(`Taxi-kasse_${new Date().toLocaleDateString("de-DE")}.pdf`); } 
+        function saveFahrername() {
+            let name = document.getElementById("fahrername").value;
+            localStorage.setItem("fahrername", name);
+        }
+
+        function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            let pdf = new jsPDF();
+            let fahrername = localStorage.getItem("fahrername") || "Unbekannt";
+            pdf.text(`Taxi-Kasse - Fahrer: ${fahrername}`, 10, 10);
+            pdf.autoTable({
+                head: [["Datum", "Summe (€)", "Gegeben (€)", "Rückgeld (€)", "Trinkgeld (€)", "EC (€)", "Einnahmen (€)"]],
+                body: einnahmen.map(entry => [
+                    entry.timestamp, entry.summe.toFixed(2), entry.gegeben.toFixed(2), 
+                    entry.rueckgeld.toFixed(2), entry.trinkgeld.toFixed(2), 
+                    entry.ecZahlung.toFixed(2), entry.einnahme.toFixed(2)
+                ])
+            });
+            let totalBar = einnahmen.reduce((sum, e) => sum + e.summe, 0);
+            let totalEC = einnahmen.reduce((sum, e) => sum + e.ecZahlung, 0);
+            let gesamtEinnahmen = totalBar + totalEC;
+            pdf.text(`Gesamteinnahmen: ${gesamtEinnahmen.toFixed(2)}€`, 10, pdf.lastAutoTable.finalY + 10);
+            pdf.save(`Taxi-Kasse_${fahrername}_${new Date().toLocaleDateString("de-DE")}.pdf`);
+        } 
   
     function shareWhatsApp() {
     let totalBar = 0, totalEC = 0, totalTrinkgeld = 0;
@@ -179,6 +202,10 @@
         einnahmen = [];    
         displayEntries();    
     }    
+
+        window.onload = function () {
+            document.getElementById("fahrername").value = localStorage.getItem("fahrername") || "";
+        };
   
     window.onload = displayEntries;    
 </script>  </body>    
