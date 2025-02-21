@@ -109,20 +109,28 @@
         }
 
         function addEntry() {
-            let summe = parseFloat(document.getElementById("summe").value) || 0;
-            let gegeben = parseFloat(document.getElementById("gegeben").value) || 0;
-            let rueckgeld = parseFloat(document.getElementById("rueckgeld").value) || 0;
-            let rueckgeldTats = parseFloat(document.getElementById("rueckgeldTats").value) || 0;
-            let trinkgeld = parseFloat(document.getElementById("trinkgeld").value) || 0;
-            let ecZahlung = parseFloat(document.getElementById("ecZahlung").value) || 0;
-            let einnahme = summe + ecZahlung;
-            let timestamp = new Date().toLocaleString("de-DE");
+    let summe = parseFloat(document.getElementById("summe").value) || 0;
+    let gegeben = parseFloat(document.getElementById("gegeben").value) || 0;
+    let rueckgeld = parseFloat(document.getElementById("rueckgeld").value) || 0;
+    let rueckgeldTats = parseFloat(document.getElementById("rueckgeldTats").value) || 0;
+    let trinkgeld = parseFloat(document.getElementById("trinkgeld").value) || 0;
+    let ecZahlung = parseFloat(document.getElementById("ecZahlung").value) || 0;
+    let einnahme = summe + ecZahlung;
+    let timestamp = new Date().toLocaleString("de-DE");
 
-            einnahmen.unshift({ summe, gegeben, rueckgeld, rueckgeldTats, trinkgeld, ecZahlung, einnahme, timestamp });
-            localStorage.setItem("einnahmen", JSON.stringify(einnahmen));
+    einnahmen.unshift({ summe, gegeben, rueckgeld, rueckgeldTats, trinkgeld, ecZahlung, einnahme, timestamp });
+    localStorage.setItem("einnahmen", JSON.stringify(einnahmen));
 
-            displayEntries();
-        }
+    displayEntries();
+
+    // Eingabefelder zurücksetzen (außer Fahrername)
+    document.getElementById("summe").value = "";
+    document.getElementById("gegeben").value = "";
+    document.getElementById("rueckgeld").value = "";
+    document.getElementById("rueckgeldTats").value = "";
+    document.getElementById("trinkgeld").value = "";
+    document.getElementById("ecZahlung").value = "";
+}
 
         function displayEntries() {
             let output = document.getElementById("output");
