@@ -1,4 +1,162 @@
-function shareWhatsApp() {
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schichtkasse</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.27/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 6px 0;
+            border-radius: 6px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-add { background: #28a745; color: white; }
+        .btn-export { background: #007bff; color: white; }
+        .btn-share { background: #25D366; color: white; }
+        .btn-reset { background: #dc3545; color: white; }
+        .entry {
+            border: 2px solid #007bff;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 8px 0;
+            background: #e9ecef;
+            text-align: left;
+        }
+        .summary-box {
+            background: #d4edda;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+            text-align: center;
+            border: 2px solid #28a745;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📊 Taxi-Kasse</h2>
+        <input type="number" id="summe" placeholder="Summe (€)" required oninput="calculateRueckgeld()">
+        <input type="number" id="gegeben" placeholder="Gegeben (€)" required oninput="calculateRueckgeld()">
+        <input type="number" id="rueckgeld" placeholder="Rückgeld (berechnet) (€)" required readonly>
+        <input type="number" id="rueckgeldTats" placeholder="Rückgeld (tatsächlich) (€)" required oninput="calculateTrinkgeld()">
+        <input type="number" id="trinkgeld" placeholder="Trinkgeld (€)" required readonly>
+        <input type="number" id="ecZahlung" placeholder="EC-Zahlung (€)" required>
+
+        <button class="btn-add" onclick="addEntry()">➕ Berechnen</button>
+
+        <div id="output"></div>
+
+        <hr>
+
+        <button class="btn-export" onclick="exportPDF()">📄 PDF speichern</button>
+        <button class="btn-share" onclick="shareWhatsApp()">📱 Teilen via WhatsApp</button>
+        <button class="btn-reset" onclick="resetData()">🗑️ Alle Daten löschen</button>
+    </div>
+
+    <script>
+        let einnahmen = JSON.parse(localStorage.getItem("einnahmen")) || [];
+
+        function calculateRueckgeld() {
+            let summe = parseFloat(document.getElementById("summe").value) || 0;
+            let gegeben = parseFloat(document.getElementById("gegeben").value) || 0;
+            let rueckgeld = Math.max(gegeben - summe, 0);
+            document.getElementById("rueckgeld").value = rueckgeld.toFixed(2);
+            calculateTrinkgeld();
+        }
+
+        function calculateTrinkgeld() {
+            let rueckgeld = parseFloat(document.getElementById("rueckgeld").value) || 0;
+            let rueckgeldTats = parseFloat(document.getElementById("rueckgeldTats").value) || 0;
+            let trinkgeld = Math.max(rueckgeld - rueckgeldTats, 0);
+            document.getElementById("trinkgeld").value = trinkgeld.toFixed(2);
+        }
+
+        function addEntry() {
+            let summe = parseFloat(document.getElementById("summe").value) || 0;
+            let gegeben = parseFloat(document.getElementById("gegeben").value) || 0;
+            let rueckgeld = parseFloat(document.getElementById("rueckgeld").value) || 0;
+            let rueckgeldTats = parseFloat(document.getElementById("rueckgeldTats").value) || 0;
+            let trinkgeld = parseFloat(document.getElementById("trinkgeld").value) || 0;
+            let ecZahlung = parseFloat(document.getElementById("ecZahlung").value) || 0;
+            let einnahme = summe + ecZahlung;
+            let timestamp = new Date().toLocaleString("de-DE");
+
+            einnahmen.unshift({ summe, gegeben, rueckgeld, rueckgeldTats, trinkgeld, ecZahlung, einnahme, timestamp });
+            localStorage.setItem("einnahmen", JSON.stringify(einnahmen));
+
+            displayEntries();
+        }
+
+        function displayEntries() {
+            let output = document.getElementById("output");
+            output.innerHTML = "";
+            let totalBar = 0, totalEC = 0, totalTrinkgeld = 0;
+
+            einnahmen.forEach(entry => {
+                totalBar += entry.summe;
+                totalEC += entry.ecZahlung;
+                totalTrinkgeld += entry.trinkgeld;
+
+                output.innerHTML += `
+                    <div class="entry">
+                        📅 ${entry.timestamp}<br>
+                        💵 Summe: ${entry.summe.toFixed(2)}€<br>
+                        💳 EC-Zahlung: ${entry.ecZahlung.toFixed(2)}€<br>
+                        🎁 Trinkgeld: ${entry.trinkgeld.toFixed(2)}€
+                    </div>
+                `;
+            });
+
+            output.innerHTML += `
+                <div class="summary-box">
+                    💵 Gesamt Bar: ${totalBar.toFixed(2)}€<br>
+                    💳 Gesamt EC-Zahlungen: ${totalEC.toFixed(2)}€<br>
+                    🎁 Gesamt Trinkgeld: ${totalTrinkgeld.toFixed(2)}€<br>
+                    <hr>
+                    📆 Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)}€
+                </div>
+            `;
+        }
+
+        function exportPDF() { const { jsPDF } = window.jspdf; let pdf = new jsPDF(); pdf.text("Taxi-Kasse - Übersicht", 10, 10); let totalBar = 0, totalEC = 0; einnahmen.forEach(entry => { totalBar += entry.summe; totalEC += entry.ecZahlung; }); let gesamtEinnahmen = totalBar + totalEC; pdf.autoTable({ head: [["Datum", "Summe (€)", "Gegeben (€)", "Rückgeld (€)", "Trinkgeld (€)", "EC (€)", "Einnahmen (€)"]], body: einnahmen.map(entry => [ entry.timestamp, entry.summe.toFixed(2), entry.gegeben.toFixed(2), entry.rueckgeld.toFixed(2), entry.trinkgeld.toFixed(2), entry.ecZahlung.toFixed(2), entry.einnahme.toFixed(2) ]) }); pdf.text(`Gesamteinnahmen: ${gesamtEinnahmen.toFixed(2)}€`, 10, pdf.lastAutoTable.finalY + 10); pdf.save(`Taxi-kasse_${new Date().toLocaleDateString("de-DE")}.pdf`); } 
+  
+    function shareWhatsApp() {
     let totalBar = 0, totalEC = 0, totalTrinkgeld = 0;
 
     einnahmen.forEach(entry => {
@@ -14,3 +172,13 @@ function shareWhatsApp() {
     
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank");
 }
+  
+    function resetData() {    
+        localStorage.removeItem("einnahmen");    
+        einnahmen = [];    
+        displayEntries();    
+    }    
+  
+    window.onload = displayEntries;    
+</script>  </body>    
+</html>
