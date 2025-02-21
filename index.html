@@ -71,6 +71,7 @@
 <body>
     <div class="container">
         <h2>📊 Taxi-Kasse</h2>
+        <input type="text" id="fahrername" placeholder="Fahrername" required oninput="saveFahrername()">
         <input type="number" id="summe" placeholder="Summe (€)" required oninput="calculateRueckgeld()">
         <input type="number" id="gegeben" placeholder="Gegeben (€)" required oninput="calculateRueckgeld()">
         <input type="number" id="rueckgeld" placeholder="Rückgeld (berechnet) (€)" required readonly>
