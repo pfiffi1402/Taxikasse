@@ -78,6 +78,7 @@
         <input type="number" id="rueckgeldTats" placeholder="Rückgeld (tatsächlich) (€)" required oninput="calculateTrinkgeld()">
         <input type="number" id="trinkgeld" placeholder="Trinkgeld (€)" required readonly>
         <input type="number" id="ecZahlung" placeholder="EC-Zahlung (€)" required>
+        <input type="number" id="ecTrinkgeld" placeholder="Trinkgeld bei EC (€)" required>
 
         <button class="btn-add" onclick="addEntry()">➕ Berechnen</button>
 
@@ -115,10 +116,12 @@
     let rueckgeldTats = parseFloat(document.getElementById("rueckgeldTats").value) || 0;
     let trinkgeld = parseFloat(document.getElementById("trinkgeld").value) || 0;
     let ecZahlung = parseFloat(document.getElementById("ecZahlung").value) || 0;
-    let einnahme = summe + ecZahlung;
+    let ecTrinkgeld = parseFloat(document.getElementById("ecTrinkgeld").value) || 0; // Neu!
+
+    let einnahme = summe + ecZahlung + ecTrinkgeld; // Trinkgeld bei EC addieren!
     let timestamp = new Date().toLocaleString("de-DE");
 
-    einnahmen.unshift({ summe, gegeben, rueckgeld, rueckgeldTats, trinkgeld, ecZahlung, einnahme, timestamp });
+    einnahmen.unshift({ summe, gegeben, rueckgeld, rueckgeldTats, trinkgeld, ecZahlung, ecTrinkgeld, einnahme, timestamp });
     localStorage.setItem("einnahmen", JSON.stringify(einnahmen));
 
     displayEntries();
@@ -130,38 +133,44 @@
     document.getElementById("rueckgeldTats").value = "";
     document.getElementById("trinkgeld").value = "";
     document.getElementById("ecZahlung").value = "";
+    document.getElementById("ecTrinkgeld").value = ""; // Neu!
 }
 
+
         function displayEntries() {
-            let output = document.getElementById("output");
-            output.innerHTML = "";
-            let totalBar = 0, totalEC = 0, totalTrinkgeld = 0;
+    let output = document.getElementById("output");
+    output.innerHTML = "";
+    let totalBar = 0, totalEC = 0, totalTrinkgeld = 0, totalECTrinkgeld = 0;
 
-            einnahmen.forEach(entry => {
-                totalBar += entry.summe;
-                totalEC += entry.ecZahlung;
-                totalTrinkgeld += entry.trinkgeld;
+    einnahmen.forEach(entry => {
+        totalBar += entry.summe;
+        totalEC += entry.ecZahlung;
+        totalTrinkgeld += entry.trinkgeld;
+        totalECTrinkgeld += entry.ecTrinkgeld; // Neu!
 
-                output.innerHTML += `
-                    <div class="entry">
-                        📅 ${entry.timestamp}<br>
-                        💵 Summe: ${entry.summe.toFixed(2)}€<br>
-                        💳 EC-Zahlung: ${entry.ecZahlung.toFixed(2)}€<br>
-                        🎁 Trinkgeld: ${entry.trinkgeld.toFixed(2)}€
-                    </div>
-                `;
-            });
+        output.innerHTML += `
+            <div class="entry">
+                📅 ${entry.timestamp}<br>
+                💵 Summe: ${entry.summe.toFixed(2)}€<br>
+                💳 EC-Zahlung: ${entry.ecZahlung.toFixed(2)}€<br>
+                🎁 Trinkgeld (Bar): ${entry.trinkgeld.toFixed(2)}€<br>
+                🎁 Trinkgeld (EC): ${entry.ecTrinkgeld.toFixed(2)}€<br> <!-- Neu! -->
+            </div>
+        `;
+    });
 
-            output.innerHTML += `
-                <div class="summary-box">
-                    💵 Gesamt Bar: ${totalBar.toFixed(2)}€<br>
-                    💳 Gesamt EC-Zahlungen: ${totalEC.toFixed(2)}€<br>
-                    🎁 Gesamt Trinkgeld: ${totalTrinkgeld.toFixed(2)}€<br>
-                    <hr>
-                    📆 Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)}€
-                </div>
-            `;
-        }
+    output.innerHTML += `
+        <div class="summary-box">
+            💵 Gesamt Bar: ${totalBar.toFixed(2)}€<br>
+            💳 Gesamt EC-Zahlungen: ${totalEC.toFixed(2)}€<br>
+            🎁 Gesamt Trinkgeld (Bar): ${totalTrinkgeld.toFixed(2)}€<br>
+            🎁 Gesamt Trinkgeld (EC): ${totalECTrinkgeld.toFixed(2)}€<br> <!-- Neu! -->
+            <hr>
+            📆 Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)}€ <!-- Neu! -->
+        </div>
+    `;
+}
+
 
         function saveFahrername() {
             let name = document.getElementById("fahrername").value;
@@ -174,12 +183,14 @@
             let fahrername = localStorage.getItem("fahrername") || "Unbekannt";
             pdf.text(`Taxi-Kasse - Fahrer: ${fahrername}`, 10, 10);
             pdf.autoTable({
-                head: [["Datum", "Summe (€)", "Gegeben (€)", "Rückgeld (€)", "Trinkgeld (€)", "EC (€)", "Einnahmen (€)"]],
+                head: [["Datum", "Summe (€)", "Gegeben (€)", "Rückgeld (€)", "Trinkgeld Bar (€)", "Trinkgeld EC (€)", "EC (€)", "Einnahmen (€)"]],
+
                 body: einnahmen.map(entry => [
-                    entry.timestamp, entry.summe.toFixed(2), entry.gegeben.toFixed(2), 
-                    entry.rueckgeld.toFixed(2), entry.trinkgeld.toFixed(2), 
-                    entry.ecZahlung.toFixed(2), entry.einnahme.toFixed(2)
-                ])
+    entry.timestamp, entry.summe.toFixed(2), entry.gegeben.toFixed(2), 
+    entry.rueckgeld.toFixed(2), entry.trinkgeld.toFixed(2), entry.ecTrinkgeld.toFixed(2), 
+    entry.ecZahlung.toFixed(2), entry.einnahme.toFixed(2)
+])
+
             });
             let totalBar = einnahmen.reduce((sum, e) => sum + e.summe, 0);
             let totalEC = einnahmen.reduce((sum, e) => sum + e.ecZahlung, 0);
