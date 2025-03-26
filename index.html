@@ -173,17 +173,9 @@
 
 
         function saveFahrername() {
-    let name = document.getElementById("fahrername").value.trim();
-    if (name) {
-        localStorage.setItem("fahrername", name);
-    }
-}
-
-window.onload = function () {
-    document.getElementById("fahrername").value = localStorage.getItem("fahrername") || "";
-    displayEntries();
-};
-
+            let name = document.getElementById("fahrername").value;
+            localStorage.setItem("fahrername", name);
+        }
 
         function exportPDF() {
             const { jsPDF } = window.jspdf;
