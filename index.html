@@ -144,8 +144,7 @@
     einnahmen.forEach(entry => {
         totalBar += entry.summe;
         totalEC += entry.ecZahlung;
-        totalTrinkgeld += entry.trinkgeld;
-        totalTrinkgeld += entry.trinkgeld + entry.ecTrinkgeld;
+                totalTrinkgeld += entry.trinkgeld + entry.ecTrinkgeld;
 
         output.innerHTML += `
             <div class="entry">
@@ -162,7 +161,7 @@
         <div class="summary-box">
             💵 Gesamt Bar: ${totalBar.toFixed(2)}€<br>
             💳 Gesamt EC-Zahlungen: ${totalEC.toFixed(2)}€<br>
-            🎁 Gesamt Trinkgeld (Bar): ${(totalTrinkgeld + totalECTrinkgeld).toFixed(2)}€<br>
+            🎁 Gesamt Trinkgeld : ${(totalTrinkgeld + totalECTrinkgeld).toFixed(2)}€<br>
                         <hr>
             📆 Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)}€ <!-- Neu! -->
         </div>
