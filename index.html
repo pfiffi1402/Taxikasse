@@ -66,6 +66,11 @@
             border: 2px solid #28a745;
             font-weight: bold;
         }
+        .rahmen {
+            border: 2px solid #ff00ee;
+            padding: 10px;
+            width: fit-content;
+        }
     </style>
 </head>
 <body>
@@ -162,8 +167,8 @@
             💵 Gesamt Bar: ${totalBar.toFixed(2)}€<br>
             💳 Gesamt EC : ${totalEC.toFixed(2)}€<br>
             <hr>
-            <span style="border: 2px solid #ff00ee;">📆 Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)}€<br>
-            🎁 Gesamt Trinkgeld : ${(totalTrinkgeld + totalECTrinkgeld).toFixed(2)}€<br></span>
+            <div class="rahmen">📆 Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)}€<br>
+            🎁 Gesamt Trinkgeld : ${(totalTrinkgeld + totalECTrinkgeld).toFixed(2)}€</div>
         </div>
     `;
 }
