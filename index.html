@@ -145,7 +145,7 @@
         totalBar += entry.summe;
         totalEC += entry.ecZahlung;
         totalTrinkgeld += entry.trinkgeld;
-        totalECTrinkgeld += entry.ecTrinkgeld; // Neu!
+        totalTrinkgeld += entry.trinkgeld + entry.ecTrinkgeld;
 
         output.innerHTML += `
             <div class="entry">
@@ -163,8 +163,8 @@
             💵 Gesamt Bar: ${totalBar.toFixed(2)}€<br>
             💳 Gesamt EC-Zahlungen: ${totalEC.toFixed(2)}€<br>
             🎁 Gesamt Trinkgeld (Bar): ${totalTrinkgeld.toFixed(2)}€<br>
-            🎁 Gesamt Trinkgeld (EC): ${totalECTrinkgeld.toFixed(2)}€<br> <!-- Neu! -->
-            <hr>
+            🎁 Gesamt Trinkgeld (Bar): ${(totalTrinkgeld + totalECTrinkgeld).toFixed(2)}€<br>
+                        <hr>
             📆 Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)}€ <!-- Neu! -->
         </div>
     `;
