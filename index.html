@@ -148,9 +148,9 @@
 
         output.innerHTML += `
             <div class="entry">
-                📅 ${entry.timestamp}<br>
+                📅 ${entry.timestamp}<br><hr>
                 💵 Summe: ${entry.summe.toFixed(2)}€<br>
-                💳 EC-Zahlung: ${entry.ecZahlung.toFixed(2)}€<br>
+                💳 EC-Zahlung: ${entry.ecZahlung.toFixed(2)}€<br><hr>
                 🎁 Trinkgeld (Bar): ${entry.trinkgeld.toFixed(2)}€<br>
                 🎁 Trinkgeld (EC): ${entry.ecTrinkgeld.toFixed(2)}€<br> <!-- Neu! -->
             </div>
@@ -160,11 +160,11 @@
     output.innerHTML += `
         <div class="summary-box">
             💵 Gesamt Bar: ${totalBar.toFixed(2)}€<br>
-            💳 Gesamt EC-Zahlungen: ${totalEC.toFixed(2)}€<br>
+            💳 Gesamt EC : ${totalEC.toFixed(2)}€<br>
             🎁 Gesamt Trinkgeld : ${(totalTrinkgeld + totalECTrinkgeld).toFixed(2)}€<br>
                         <hr><hr>
-            📆 Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)}€ <br><hr>
-            🎁 Gesamt Trinkgeld : ${(totalTrinkgeld + totalECTrinkgeld).toFixed(2)}€<br>
+            <span style="border: 1px solid black;"📆 Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)}€ <br><hr>
+            🎁 Gesamt Trinkgeld : ${(totalTrinkgeld + totalECTrinkgeld).toFixed(2)}€<br></span>
         </div>
     `;
 }
