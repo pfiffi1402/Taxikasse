@@ -30,15 +30,17 @@
     input {
       width: 80%;
       padding: 10px;
-      margin: 6px 0;
+      margin: 6px 0 12px 0;
       border-radius: 6px;
       font-size: 16px;
       border: 1px solid #ddd;
     }
-    label {
+    /* Labels nur im Bearbeiten-Modus anzeigen */
+    .edit-label {
       display: block;
       font-weight: bold;
       margin-top: 10px;
+      text-align: left;
     }
     button {
       width: 100%;
@@ -85,22 +87,16 @@
 <body>
   <div class="container">
     <h2>📊 Taxi-Kasse</h2>
-    <label for="fahrername">Fahrername:</label>
+
     <input type="text" id="fahrername" placeholder="Fahrername" required oninput="saveFahrername()">
-    <label for="summe">Summe (€):</label>
-    <input type="number" id="summe" placeholder="Summe" oninput="calculateRueckgeld()">
-    <label for="gegeben">Gegeben (€):</label>
-    <input type="number" id="gegeben" placeholder="Gegeben" oninput="calculateRueckgeld()">
-    <label for="rueckgeld">Rückgeld (berechnet):</label>
-    <input type="number" id="rueckgeld" placeholder="Rückgeld" readonly>
-    <label for="rueckgeldTats">Rückgeld (tatsächlich):</label>
-    <input type="number" id="rueckgeldTats" placeholder="Tatsächliches Rückgeld" oninput="calculateTrinkgeld()">
-    <label for="trinkgeld">Trinkgeld (€):</label>
-    <input type="number" id="trinkgeld" placeholder="Trinkgeld" readonly>
-    <label for="ecZahlung">EC-Zahlung (€):</label>
-    <input type="number" id="ecZahlung" placeholder="EC-Zahlung">
-    <label for="ecTrinkgeld">Trinkgeld bei EC (€):</label>
-    <input type="number" id="ecTrinkgeld" placeholder="Trinkgeld EC">
+    <input type="number" id="summe" placeholder="Summe (€)" oninput="calculateRueckgeld()">
+    <input type="number" id="gegeben" placeholder="Gegeben (€)" oninput="calculateRueckgeld()">
+    <input type="number" id="rueckgeld" placeholder="Rückgeld (berechnet)" readonly>
+    <input type="number" id="rueckgeldTats" placeholder="Rückgeld (tatsächlich)" oninput="calculateTrinkgeld()">
+    <input type="number" id="trinkgeld" placeholder="Trinkgeld (€)" readonly>
+    <input type="number" id="ecZahlung" placeholder="EC-Zahlung (€)">
+    <input type="number" id="ecTrinkgeld" placeholder="Trinkgeld bei EC (€)">
+
     <button class="btn-add" onclick="addEntry()">➕ Berechnen</button>
 
     <div id="output"></div>
@@ -198,19 +194,19 @@
       container.innerHTML = 
         `<div>
           📅 ${entry.timestamp}<br><hr>
-          <label>Summe (€):</label>
+          <label class="edit-label" for="edit-summe">Summe (€):</label>
           <input type="number" id="edit-summe" value="${entry.summe}" oninput="updateRueckgeld(${index})"><br>
-          <label>Gegeben (€):</label>
+          <label class="edit-label" for="edit-gegeben">Gegeben (€):</label>
           <input type="number" id="edit-gegeben" value="${entry.gegeben}" oninput="updateRueckgeld(${index})"><br>
-          <label>Rückgeld (berechnet):</label>
+          <label class="edit-label" for="edit-rueckgeld">Rückgeld (berechnet):</label>
           <input type="number" id="edit-rueckgeld" value="${entry.rueckgeld}" readonly><br>
-          <label>Rückgeld (tatsächlich):</label>
+          <label class="edit-label" for="edit-rueckgeldTats">Rückgeld (tatsächlich):</label>
           <input type="number" id="edit-rueckgeldTats" value="${entry.rueckgeldTats}" oninput="updateTrinkgeld(${index})"><br>
-          <label>Trinkgeld (€):</label>
+          <label class="edit-label" for="edit-trinkgeld">Trinkgeld (€):</label>
           <input type="number" id="edit-trinkgeld" value="${entry.trinkgeld}" readonly><br>
-          <label>EC-Zahlung (€):</label>
+          <label class="edit-label" for="edit-ecZahlung">EC-Zahlung (€):</label>
           <input type="number" id="edit-ecZahlung" value="${entry.ecZahlung}"><br>
-          <label>Trinkgeld bei EC (€):</label>
+          <label class="edit-label" for="edit-ecTrinkgeld">Trinkgeld bei EC (€):</label>
           <input type="number" id="edit-ecTrinkgeld" value="${entry.ecTrinkgeld}"><br>
           <button class="btn-save" onclick="saveEdit(${index})">💾 Speichern</button>
         </div>`;
@@ -323,7 +319,7 @@
       displayEntries();
     };
 
-    // NEU: Druckfunktion
+    // Druckfunktion
     function printHTML() {
       const printWindow = window.open('', '_blank');
       const content = document.querySelector('.container').innerHTML;
@@ -348,8 +344,6 @@
       printWindow.document.close();
       printWindow.focus();
       printWindow.print();
-      // Optional: Fenster nach Druck schließen
-      // printWindow.close();
     }
   </script>
 </body>
