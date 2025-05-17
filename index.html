@@ -35,6 +35,11 @@
       font-size: 16px;
       border: 1px solid #ddd;
     }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 10px;
+    }
     button {
       width: 100%;
       padding: 12px;
@@ -79,14 +84,22 @@
 <body>
   <div class="container">
     <h2>📊 Taxi-Kasse</h2>
-    <input type="text" id="fahrername" placeholder="Fahrername" required oninput="saveFahrername()">
-    <input type="number" id="summe" placeholder="Summe (€)" required oninput="calculateRueckgeld()">
-    <input type="number" id="gegeben" placeholder="Gegeben (€)" required oninput="calculateRueckgeld()">
-    <input type="number" id="rueckgeld" placeholder="Rückgeld (berechnet) (€)" required readonly>
-    <input type="number" id="rueckgeldTats" placeholder="Rückgeld (tatsächlich) (€)" required oninput="calculateTrinkgeld()">
-    <input type="number" id="trinkgeld" placeholder="Trinkgeld (€)" required readonly>
-    <input type="number" id="ecZahlung" placeholder="EC-Zahlung (€)" required>
-    <input type="number" id="ecTrinkgeld" placeholder="Trinkgeld bei EC (€)" required>
+    <label for="fahrername">Fahrername:</label>
+    <input type="text" id="fahrername" required oninput="saveFahrername()">
+    <label for="summe">Summe (€):</label>
+    <input type="number" id="summe" oninput="calculateRueckgeld()">
+    <label for="gegeben">Gegeben (€):</label>
+    <input type="number" id="gegeben" oninput="calculateRueckgeld()">
+    <label for="rueckgeld">Rückgeld (berechnet):</label>
+    <input type="number" id="rueckgeld" readonly>
+    <label for="rueckgeldTats">Rückgeld (tatsächlich):</label>
+    <input type="number" id="rueckgeldTats" oninput="calculateTrinkgeld()">
+    <label for="trinkgeld">Trinkgeld (€):</label>
+    <input type="number" id="trinkgeld" readonly>
+    <label for="ecZahlung">EC-Zahlung (€):</label>
+    <input type="number" id="ecZahlung">
+    <label for="ecTrinkgeld">Trinkgeld bei EC (€):</label>
+    <input type="number" id="ecTrinkgeld">
     <button class="btn-add" onclick="addEntry()">➕ Berechnen</button>
 
     <div id="output"></div>
@@ -182,22 +195,44 @@
       const container = document.getElementById(`entry-${index}`);
       container.innerHTML = `
         📅 ${entry.timestamp}<br><hr>
-        <input type="number" id="edit-summe" value="${entry.summe}" placeholder="Summe (€)" oninput="calculateRueckgeld()"><br>
-        <input type="number" id="edit-gegeben" value="${entry.gegeben}" placeholder="Gegeben (€)" oninput="calculateRueckgeld()"><br>
-        <input type="number" value="${entry.rueckgeld}" placeholder="Rückgeld (€)" readonly><br>
-        <input type="number" id="edit-rueckgeldTats" value="${entry.rueckgeldTats}" placeholder="Rückgeld (tatsächlich)" oninput="calculateTrinkgeld()"><br>
-        <input type="number" value="${entry.trinkgeld}" placeholder="Trinkgeld (€)" readonly><br>
-        <input type="number" id="edit-ecZahlung" value="${entry.ecZahlung}" placeholder="EC-Zahlung (€)"><br>
-        <input type="number" id="edit-ecTrinkgeld" value="${entry.ecTrinkgeld}" placeholder="Trinkgeld EC (€)"><br>
+        <label>Summe (€):</label>
+        <input type="number" id="edit-summe" value="${entry.summe}" oninput="updateRueckgeld(${index})"><br>
+        <label>Gegeben (€):</label>
+        <input type="number" id="edit-gegeben" value="${entry.gegeben}" oninput="updateRueckgeld(${index})"><br>
+        <label>Rückgeld (berechnet):</label>
+        <input type="number" id="edit-rueckgeld" value="${entry.rueckgeld}" readonly><br>
+        <label>Rückgeld (tatsächlich):</label>
+        <input type="number" id="edit-rueckgeldTats" value="${entry.rueckgeldTats}" oninput="updateTrinkgeld(${index})"><br>
+        <label>Trinkgeld (€):</label>
+        <input type="number" id="edit-trinkgeld" value="${entry.trinkgeld}" readonly><br>
+        <label>EC-Zahlung (€):</label>
+        <input type="number" id="edit-ecZahlung" value="${entry.ecZahlung}"><br>
+        <label>Trinkgeld bei EC (€):</label>
+        <input type="number" id="edit-ecTrinkgeld" value="${entry.ecTrinkgeld}"><br>
         <button class="btn-save" onclick="saveEdit(${index})">💾 Speichern</button>`;
+    }
+
+    function updateRueckgeld(index) {
+      const summe = parseFloat(document.getElementById("edit-summe").value) || 0;
+      const gegeben = parseFloat(document.getElementById("edit-gegeben").value) || 0;
+      const rueckgeld = Math.max(gegeben - summe, 0);
+      document.getElementById("edit-rueckgeld").value = rueckgeld.toFixed(2);
+      updateTrinkgeld(index);
+    }
+
+    function updateTrinkgeld(index) {
+      const rueckgeld = parseFloat(document.getElementById("edit-rueckgeld").value) || 0;
+      const rueckgeldTats = parseFloat(document.getElementById("edit-rueckgeldTats").value) || 0;
+      const trinkgeld = Math.max(rueckgeld - rueckgeldTats, 0);
+      document.getElementById("edit-trinkgeld").value = trinkgeld.toFixed(2);
     }
 
     function saveEdit(index) {
       const summe = parseFloat(document.getElementById("edit-summe").value) || 0;
       const gegeben = parseFloat(document.getElementById("edit-gegeben").value) || 0;
-      const rueckgeld = Math.max(gegeben - summe, 0);
+      const rueckgeld = parseFloat(document.getElementById("edit-rueckgeld").value) || 0;
       const rueckgeldTats = parseFloat(document.getElementById("edit-rueckgeldTats").value) || 0;
-      const trinkgeld = Math.max(rueckgeld - rueckgeldTats, 0);
+      const trinkgeld = parseFloat(document.getElementById("edit-trinkgeld").value) || 0;
       const ecZahlung = parseFloat(document.getElementById("edit-ecZahlung").value) || 0;
       const ecTrinkgeld = parseFloat(document.getElementById("edit-ecTrinkgeld").value) || 0;
       const einnahme = summe + ecZahlung;
@@ -268,3 +303,4 @@
   </script>
 </body>
 </html>
+
