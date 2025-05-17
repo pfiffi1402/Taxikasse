@@ -320,31 +320,30 @@
     };
 
     // Druckfunktion
-    function printHTML() {
-      const printWindow = window.open('', '_blank');
-      const content = document.querySelector('.container').innerHTML;
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Druckansicht Taxi-Kasse</title>
-            <style>
-              body { font-family: Arial, sans-serif; margin: 20px; }
-              .entry { border: 1px solid #000; padding: 10px; margin-bottom: 10px; }
-              .summary-box { border: 2px solid #000; padding: 15px; font-weight: bold; }
-              h2 { text-align: center; }
-              label, input, button { display: none; } /* Verstecke Formular im Druck */
-            </style>
-          </head>
-          <body>
-            <h2>Taxi-Kasse Druckansicht</h2>
-            ${content}
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.focus();
-      printWindow.print();
-    }
+   function printHTML() {
+  const printWindow = window.open('', '_blank');
+  const content = document.querySelector('.pdf-content').innerHTML;
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Druckansicht Taxi-Kasse</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          .entry { border: 1px solid #000; padding: 10px; margin-bottom: 10px; }
+          .summary-box { border: 2px solid #000; padding: 15px; font-weight: bold; }
+          h2 { text-align: center; }
+        </style>
+      </head>
+      <body>
+        <h2>Taxi-Kasse Druckansicht</h2>
+        ${content}
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+}
   </script>
 </body>
 </html>
