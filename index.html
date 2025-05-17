@@ -56,6 +56,8 @@
     .btn-reset { background: #dc3545; color: white; }
     .btn-edit { background: #ffc107; color: black; }
     .btn-save { background: #17a2b8; color: white; }
+    .btn-print { background: #6c757d; color: white; }
+
     .entry {
       border: 2px solid #007bff;
       padding: 12px;
@@ -83,20 +85,29 @@
 <body>
   <div class="container">
     <h2>📊 Taxi-Kasse</h2>
+    <label for="fahrername">Fahrername:</label>
     <input type="text" id="fahrername" placeholder="Fahrername" required oninput="saveFahrername()">
-    <input type="number" id="summe" placeholder="Summe (€)" oninput="calculateRueckgeld()">
-    <input type="number" id="gegeben" placeholder="Gegeben (€)" oninput="calculateRueckgeld()">
-    <input type="number" id="rueckgeld" placeholder="Rückgeld (berechnet)" readonly>
-    <input type="number" id="rueckgeldTats" placeholder="Rückgeld (tatsächlich)" oninput="calculateTrinkgeld()">
-    <input type="number" id="trinkgeld" placeholder="Trinkgeld (€)" readonly>
-    <input type="number" id="ecZahlung" placeholder="EC-Zahlung (€)">
-    <input type="number" id="ecTrinkgeld" placeholder="Trinkgeld bei EC (€)">
+    <label for="summe">Summe (€):</label>
+    <input type="number" id="summe" placeholder="Summe" oninput="calculateRueckgeld()">
+    <label for="gegeben">Gegeben (€):</label>
+    <input type="number" id="gegeben" placeholder="Gegeben" oninput="calculateRueckgeld()">
+    <label for="rueckgeld">Rückgeld (berechnet):</label>
+    <input type="number" id="rueckgeld" placeholder="Rückgeld" readonly>
+    <label for="rueckgeldTats">Rückgeld (tatsächlich):</label>
+    <input type="number" id="rueckgeldTats" placeholder="Tatsächliches Rückgeld" oninput="calculateTrinkgeld()">
+    <label for="trinkgeld">Trinkgeld (€):</label>
+    <input type="number" id="trinkgeld" placeholder="Trinkgeld" readonly>
+    <label for="ecZahlung">EC-Zahlung (€):</label>
+    <input type="number" id="ecZahlung" placeholder="EC-Zahlung">
+    <label for="ecTrinkgeld">Trinkgeld bei EC (€):</label>
+    <input type="number" id="ecTrinkgeld" placeholder="Trinkgeld EC">
     <button class="btn-add" onclick="addEntry()">➕ Berechnen</button>
 
     <div id="output"></div>
 
     <hr>
     <button class="btn-export" onclick="exportPDF()">📄 PDF speichern</button>
+    <button class="btn-print" onclick="printHTML()">🖨️ Drucken</button>
     <button class="btn-share" onclick="shareWhatsApp()">📱 Teilen via WhatsApp</button>
     <button class="btn-reset" onclick="resetData()">🗑️ Alle Daten löschen</button>
   </div>
@@ -161,8 +172,8 @@
         totalTrinkgeld += entry.trinkgeld;
         totalECTrinkgeld += entry.ecTrinkgeld;
 
-        output.innerHTML += `
-          <div class="entry" id="entry-${index}">
+        output.innerHTML += 
+          `<div class="entry" id="entry-${index}">
             📅 ${entry.timestamp}<br><hr>
             💵 Bar-Zahlung: ${entry.summe.toFixed(2)}€<br>
             💳 EC-Zahlung: ${entry.ecZahlung.toFixed(2)}€<br><hr>
@@ -172,8 +183,8 @@
           </div>`;
       });
 
-      output.innerHTML += `
-        <div class="summary-box">
+      output.innerHTML += 
+        `<div class="summary-box">
           💵 Gesamt Bar: ${totalBar.toFixed(2)}€<br>
           💳 Gesamt EC : ${totalEC.toFixed(2)}€<br><hr>
           <center><div class="rahmen">📆 Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)}€<br><hr>
@@ -184,23 +195,25 @@
     function editEntry(index) {
       const entry = einnahmen[index];
       const container = document.getElementById(`entry-${index}`);
-      container.innerHTML = `
-        📅 ${entry.timestamp}<br><hr>
-        <label>Summe (€):</label>
-        <input type="number" id="edit-summe" value="${entry.summe}" oninput="updateRueckgeld(${index})"><br>
-        <label>Gegeben (€):</label>
-        <input type="number" id="edit-gegeben" value="${entry.gegeben}" oninput="updateRueckgeld(${index})"><br>
-        <label>Rückgeld (berechnet):</label>
-        <input type="number" id="edit-rueckgeld" value="${entry.rueckgeld}" readonly><br>
-        <label>Rückgeld (tatsächlich):</label>
-        <input type="number" id="edit-rueckgeldTats" value="${entry.rueckgeldTats}" oninput="updateTrinkgeld(${index})"><br>
-        <label>Trinkgeld (€):</label>
-        <input type="number" id="edit-trinkgeld" value="${entry.trinkgeld}" readonly><br>
-        <label>EC-Zahlung (€):</label>
-        <input type="number" id="edit-ecZahlung" value="${entry.ecZahlung}"><br>
-        <label>Trinkgeld bei EC (€):</label>
-        <input type="number" id="edit-ecTrinkgeld" value="${entry.ecTrinkgeld}"><br>
-        <button class="btn-save" onclick="saveEdit(${index})">💾 Speichern</button>`;
+      container.innerHTML = 
+        `<div>
+          📅 ${entry.timestamp}<br><hr>
+          <label>Summe (€):</label>
+          <input type="number" id="edit-summe" value="${entry.summe}" oninput="updateRueckgeld(${index})"><br>
+          <label>Gegeben (€):</label>
+          <input type="number" id="edit-gegeben" value="${entry.gegeben}" oninput="updateRueckgeld(${index})"><br>
+          <label>Rückgeld (berechnet):</label>
+          <input type="number" id="edit-rueckgeld" value="${entry.rueckgeld}" readonly><br>
+          <label>Rückgeld (tatsächlich):</label>
+          <input type="number" id="edit-rueckgeldTats" value="${entry.rueckgeldTats}" oninput="updateTrinkgeld(${index})"><br>
+          <label>Trinkgeld (€):</label>
+          <input type="number" id="edit-trinkgeld" value="${entry.trinkgeld}" readonly><br>
+          <label>EC-Zahlung (€):</label>
+          <input type="number" id="edit-ecZahlung" value="${entry.ecZahlung}"><br>
+          <label>Trinkgeld bei EC (€):</label>
+          <input type="number" id="edit-ecTrinkgeld" value="${entry.ecTrinkgeld}"><br>
+          <button class="btn-save" onclick="saveEdit(${index})">💾 Speichern</button>
+        </div>`;
     }
 
     function updateRueckgeld(index) {
@@ -226,74 +239,118 @@
       const trinkgeld = parseFloat(document.getElementById("edit-trinkgeld").value) || 0;
       const ecZahlung = parseFloat(document.getElementById("edit-ecZahlung").value) || 0;
       const ecTrinkgeld = parseFloat(document.getElementById("edit-ecTrinkgeld").value) || 0;
-      const einnahme = summe + ecZahlung;
 
       einnahmen[index] = {
         ...einnahmen[index],
-        summe, gegeben, rueckgeld, rueckgeldTats, trinkgeld, ecZahlung, ecTrinkgeld, einnahme
+        summe,
+        gegeben,
+        rueckgeld,
+        rueckgeldTats,
+        trinkgeld,
+        ecZahlung,
+        ecTrinkgeld
       };
 
       localStorage.setItem("einnahmen", JSON.stringify(einnahmen));
       displayEntries();
     }
 
+    function resetData() {
+      if (confirm("Sind Sie sicher, dass Sie alle Daten löschen möchten?")) {
+        einnahmen = [];
+        localStorage.removeItem("einnahmen");
+        localStorage.removeItem("fahrername");
+        displayEntries();
+      }
+    }
+
     function exportPDF() {
       const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
+      const doc = new jsPDF();
+
       const fahrername = localStorage.getItem("fahrername") || "Unbekannt";
-      const erstellungsdatum = new Date().toLocaleDateString("de-DE");
-      pdf.text(`Taxi-Kasse - Fahrer: ${fahrername}`, 10, 10);
-      pdf.text(`Erstellungsdatum: ${erstellungsdatum}`, 10, 20);
-      pdf.autoTable({
-        startY: 30,
-        head: [["Datum", "Summe", "Gegeben", "Rückgeld", "Trinkgeld", "EC", "EC-Trinkgeld", "Einnahmen"]],
-        body: einnahmen.map(e => [
-          e.timestamp,
-          e.summe.toFixed(2),
-          e.gegeben.toFixed(2),
-          e.rueckgeld.toFixed(2),
-          e.trinkgeld.toFixed(2),
-          e.ecZahlung.toFixed(2),
-          e.ecTrinkgeld.toFixed(2),
-          e.einnahme.toFixed(2)
-        ])
+
+      doc.setFontSize(18);
+      doc.text(`Taxi-Kasse von ${fahrername}`, 10, 10);
+
+      const columns = [
+        { header: "Datum/Uhrzeit", dataKey: "timestamp" },
+        { header: "Bar (€)", dataKey: "summe" },
+        { header: "EC (€)", dataKey: "ecZahlung" },
+        { header: "Rückgeld (berechnet)", dataKey: "rueckgeld" },
+        { header: "Rückgeld (tatsächlich)", dataKey: "rueckgeldTats" },
+        { header: "Trinkgeld Bar", dataKey: "trinkgeld" },
+        { header: "Trinkgeld EC", dataKey: "ecTrinkgeld" }
+      ];
+
+      const rows = einnahmen.map(e => ({
+        timestamp: e.timestamp,
+        summe: e.summe.toFixed(2),
+        ecZahlung: e.ecZahlung.toFixed(2),
+        rueckgeld: e.rueckgeld.toFixed(2),
+        rueckgeldTats: e.rueckgeldTats.toFixed(2),
+        trinkgeld: e.trinkgeld.toFixed(2),
+        ecTrinkgeld: e.ecTrinkgeld.toFixed(2),
+      }));
+
+      doc.autoTable({
+        head: [columns.map(col => col.header)],
+        body: rows.map(row => columns.map(col => row[col.dataKey])),
+        startY: 20,
       });
 
-      const totalBar = einnahmen.reduce((a, e) => a + e.summe, 0);
-      const totalEC = einnahmen.reduce((a, e) => a + e.ecZahlung, 0);
-      const totalTrinkgeld = einnahmen.reduce((a, e) => a + e.trinkgeld + e.ecTrinkgeld, 0);
-      const yPos = pdf.lastAutoTable.finalY + 10;
-
-      pdf.setFontSize(12);
-      pdf.text(`Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)} €`, 10, yPos);
-      pdf.text(`Gesamt-Trinkgeld: ${totalTrinkgeld.toFixed(2)} €`, 10, yPos + 7);
-
-      pdf.save(`Taxikasse-${fahrername}_${erstellungsdatum}.pdf`);
+      doc.save(`Taxi-Kasse_${fahrername}_${new Date().toISOString().slice(0,10)}.pdf`);
     }
 
     function shareWhatsApp() {
-      const totalBar = einnahmen.reduce((a, e) => a + e.summe, 0);
-      const totalEC = einnahmen.reduce((a, e) => a + e.ecZahlung, 0);
-      const totalTrinkgeld = einnahmen.reduce((a, e) => a + e.trinkgeld + e.ecTrinkgeld, 0);
-      const gesamt = (totalBar + totalEC).toFixed(2);
-      const time = new Date().toLocaleString("de-DE");
-      const msg = `📅 ${time}\n📊 Gesamteinnahmen: ${gesamt}€\n💳 EC-Zahlungen: ${totalEC.toFixed(2)}€\n🎁 Trinkgeld: ${totalTrinkgeld.toFixed(2)}€`;
-      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+      const fahrername = localStorage.getItem("fahrername") || "Unbekannt";
+      let message = `Taxi-Kasse von ${fahrername}:\n\n`;
+
+      einnahmen.forEach(e => {
+        message += `Datum: ${e.timestamp}\nBar: ${e.summe.toFixed(2)} €\nEC: ${e.ecZahlung.toFixed(2)} €\nTrinkgeld Bar: ${e.trinkgeld.toFixed(2)} €\nTrinkgeld EC: ${e.ecTrinkgeld.toFixed(2)} €\n\n`;
+      });
+
+      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank");
     }
 
-    function resetData() {
-      localStorage.removeItem("einnahmen");
-      einnahmen = [];
-      displayEntries();
-    }
-
+    // Beim Laden: Fahrername aus localStorage setzen und Einträge anzeigen
     window.onload = () => {
-      document.getElementById("fahrername").value = localStorage.getItem("fahrername") || "";
+      const gespeicherterName = localStorage.getItem("fahrername");
+      if (gespeicherterName) {
+        document.getElementById("fahrername").value = gespeicherterName;
+      }
       displayEntries();
     };
+
+    // NEU: Druckfunktion
+    function printHTML() {
+      const printWindow = window.open('', '_blank');
+      const content = document.querySelector('.container').innerHTML;
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Druckansicht Taxi-Kasse</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              .entry { border: 1px solid #000; padding: 10px; margin-bottom: 10px; }
+              .summary-box { border: 2px solid #000; padding: 15px; font-weight: bold; }
+              h2 { text-align: center; }
+              label, input, button { display: none; } /* Verstecke Formular im Druck */
+            </style>
+          </head>
+          <body>
+            <h2>Taxi-Kasse Druckansicht</h2>
+            ${content}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      // Optional: Fenster nach Druck schließen
+      // printWindow.close();
+    }
   </script>
 </body>
 </html>
-
-
-
