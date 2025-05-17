@@ -82,23 +82,23 @@
 </head>
 <body>
   <div class="container">
-    <h2>?? Taxi-Kasse</h2>
+    <h2>📊 Taxi-Kasse</h2>
     <input type="text" id="fahrername" placeholder="Fahrername" required oninput="saveFahrername()">
-    <input type="number" id="summe" placeholder="Summe (�)" oninput="calculateRueckgeld()">
-    <input type="number" id="gegeben" placeholder="Gegeben (�)" oninput="calculateRueckgeld()">
-    <input type="number" id="rueckgeld" placeholder="R�ckgeld (berechnet)" readonly>
-    <input type="number" id="rueckgeldTats" placeholder="R�ckgeld (tats�chlich)" oninput="calculateTrinkgeld()">
-    <input type="number" id="trinkgeld" placeholder="Trinkgeld (�)" readonly>
-    <input type="number" id="ecZahlung" placeholder="EC-Zahlung (�)">
-    <input type="number" id="ecTrinkgeld" placeholder="Trinkgeld bei EC (�)">
-    <button class="btn-add" onclick="addEntry()">? Berechnen</button>
+    <input type="number" id="summe" placeholder="Summe (€)" oninput="calculateRueckgeld()">
+    <input type="number" id="gegeben" placeholder="Gegeben (€)" oninput="calculateRueckgeld()">
+    <input type="number" id="rueckgeld" placeholder="Rückgeld (berechnet)" readonly>
+    <input type="number" id="rueckgeldTats" placeholder="Rückgeld (tatsächlich)" oninput="calculateTrinkgeld()">
+    <input type="number" id="trinkgeld" placeholder="Trinkgeld (€)" readonly>
+    <input type="number" id="ecZahlung" placeholder="EC-Zahlung (€)">
+    <input type="number" id="ecTrinkgeld" placeholder="Trinkgeld bei EC (€)">
+    <button class="btn-add" onclick="addEntry()">➕ Berechnen</button>
 
     <div id="output"></div>
 
     <hr>
-    <button class="btn-export" onclick="exportPDF()">?? PDF speichern</button>
-    <button class="btn-share" onclick="shareWhatsApp()">?? Teilen via WhatsApp</button>
-    <button class="btn-reset" onclick="resetData()">??? Alle Daten l�schen</button>
+    <button class="btn-export" onclick="exportPDF()">📄 PDF speichern</button>
+    <button class="btn-share" onclick="shareWhatsApp()">📱 Teilen via WhatsApp</button>
+    <button class="btn-reset" onclick="resetData()">🗑️ Alle Daten löschen</button>
   </div>
 
   <script>
@@ -163,21 +163,21 @@
 
         output.innerHTML += `
           <div class="entry" id="entry-${index}">
-            ?? ${entry.timestamp}<br><hr>
-            ?? Bar-Zahlung: ${entry.summe.toFixed(2)}�<br>
-            ?? EC-Zahlung: ${entry.ecZahlung.toFixed(2)}�<br><hr>
-            ?? Trinkgeld (Bar): ${entry.trinkgeld.toFixed(2)}�<br>
-            ?? Trinkgeld (EC): ${entry.ecTrinkgeld.toFixed(2)}�<br>
-            <button class="btn-edit" onclick="editEntry(${index})">?? Bearbeiten</button>
+            📅 ${entry.timestamp}<br><hr>
+            💵 Bar-Zahlung: ${entry.summe.toFixed(2)}€<br>
+            💳 EC-Zahlung: ${entry.ecZahlung.toFixed(2)}€<br><hr>
+            🎁 Trinkgeld (Bar): ${entry.trinkgeld.toFixed(2)}€<br>
+            🎁 Trinkgeld (EC): ${entry.ecTrinkgeld.toFixed(2)}€<br>
+            <button class="btn-edit" onclick="editEntry(${index})">✏️ Bearbeiten</button>
           </div>`;
       });
 
       output.innerHTML += `
         <div class="summary-box">
-          ?? Gesamt Bar: ${totalBar.toFixed(2)}�<br>
-          ?? Gesamt EC : ${totalEC.toFixed(2)}�<br><hr>
-          <center><div class="rahmen">?? Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)}�<br><hr>
-          ?? Gesamt Trinkgeld : ${(totalTrinkgeld + totalECTrinkgeld).toFixed(2)}�</div></center>
+          💵 Gesamt Bar: ${totalBar.toFixed(2)}€<br>
+          💳 Gesamt EC : ${totalEC.toFixed(2)}€<br><hr>
+          <center><div class="rahmen">📆 Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)}€<br><hr>
+          🎁 Gesamt Trinkgeld : ${(totalTrinkgeld + totalECTrinkgeld).toFixed(2)}€</div></center>
         </div>`;
     }
 
@@ -185,22 +185,22 @@
       const entry = einnahmen[index];
       const container = document.getElementById(`entry-${index}`);
       container.innerHTML = `
-        ?? ${entry.timestamp}<br><hr>
-        <label>Summe (�):</label>
+        📅 ${entry.timestamp}<br><hr>
+        <label>Summe (€):</label>
         <input type="number" id="edit-summe" value="${entry.summe}" oninput="updateRueckgeld(${index})"><br>
-        <label>Gegeben (�):</label>
+        <label>Gegeben (€):</label>
         <input type="number" id="edit-gegeben" value="${entry.gegeben}" oninput="updateRueckgeld(${index})"><br>
-        <label>R�ckgeld (berechnet):</label>
+        <label>Rückgeld (berechnet):</label>
         <input type="number" id="edit-rueckgeld" value="${entry.rueckgeld}" readonly><br>
-        <label>R�ckgeld (tats�chlich):</label>
+        <label>Rückgeld (tatsächlich):</label>
         <input type="number" id="edit-rueckgeldTats" value="${entry.rueckgeldTats}" oninput="updateTrinkgeld(${index})"><br>
-        <label>Trinkgeld (�):</label>
+        <label>Trinkgeld (€):</label>
         <input type="number" id="edit-trinkgeld" value="${entry.trinkgeld}" readonly><br>
-        <label>EC-Zahlung (�):</label>
+        <label>EC-Zahlung (€):</label>
         <input type="number" id="edit-ecZahlung" value="${entry.ecZahlung}"><br>
-        <label>Trinkgeld bei EC (�):</label>
+        <label>Trinkgeld bei EC (€):</label>
         <input type="number" id="edit-ecTrinkgeld" value="${entry.ecTrinkgeld}"><br>
-        <button class="btn-save" onclick="saveEdit(${index})">?? Speichern</button>`;
+        <button class="btn-save" onclick="saveEdit(${index})">💾 Speichern</button>`;
     }
 
     function updateRueckgeld(index) {
@@ -246,7 +246,7 @@
       pdf.text(`Erstellungsdatum: ${erstellungsdatum}`, 10, 20);
       pdf.autoTable({
         startY: 30,
-        head: [["Datum", "Summe", "Gegeben", "R�ckgeld", "Trinkgeld", "EC", "EC-Trinkgeld", "Einnahmen"]],
+        head: [["Datum", "Summe", "Gegeben", "Rückgeld", "Trinkgeld", "EC", "EC-Trinkgeld", "Einnahmen"]],
         body: einnahmen.map(e => [
           e.timestamp,
           e.summe.toFixed(2),
@@ -265,8 +265,8 @@
       const yPos = pdf.lastAutoTable.finalY + 10;
 
       pdf.setFontSize(12);
-      pdf.text(`Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)} �`, 10, yPos);
-      pdf.text(`Gesamt-Trinkgeld: ${totalTrinkgeld.toFixed(2)} �`, 10, yPos + 7);
+      pdf.text(`Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)} €`, 10, yPos);
+      pdf.text(`Gesamt-Trinkgeld: ${totalTrinkgeld.toFixed(2)} €`, 10, yPos + 7);
 
       pdf.save(`Taxikasse-${fahrername}_${erstellungsdatum}.pdf`);
     }
@@ -277,7 +277,7 @@
       const totalTrinkgeld = einnahmen.reduce((a, e) => a + e.trinkgeld + e.ecTrinkgeld, 0);
       const gesamt = (totalBar + totalEC).toFixed(2);
       const time = new Date().toLocaleString("de-DE");
-      const msg = `?? ${time}\n?? Gesamteinnahmen: ${gesamt}�\n?? EC-Zahlungen: ${totalEC.toFixed(2)}�\n?? Trinkgeld: ${totalTrinkgeld.toFixed(2)}�`;
+      const msg = `📅 ${time}\n📊 Gesamteinnahmen: ${gesamt}€\n💳 EC-Zahlungen: ${totalEC.toFixed(2)}€\n🎁 Trinkgeld: ${totalTrinkgeld.toFixed(2)}€`;
       window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
     }
 
@@ -294,3 +294,5 @@
   </script>
 </body>
 </html>
+
+
