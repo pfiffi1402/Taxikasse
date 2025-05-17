@@ -239,9 +239,11 @@
 
     function exportPDF() {
       const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
+      const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
       const fahrername = localStorage.getItem("fahrername") || "Unbekannt";
       const erstellungsdatum = new Date().toLocaleDateString("de-DE");
+
+      pdf.setFont("helvetica", "normal");
       pdf.text(`Taxi-Kasse - Fahrer: ${fahrername}`, 10, 10);
       pdf.text(`Erstellungsdatum: ${erstellungsdatum}`, 10, 20);
       pdf.autoTable({
@@ -249,13 +251,13 @@
         head: [["Datum", "Summe", "Gegeben", "Rückgeld", "Trinkgeld", "EC", "EC-Trinkgeld", "Einnahmen"]],
         body: einnahmen.map(e => [
           e.timestamp,
-          e.summe.toFixed(2),
-          e.gegeben.toFixed(2),
-          e.rueckgeld.toFixed(2),
-          e.trinkgeld.toFixed(2),
-          e.ecZahlung.toFixed(2),
-          e.ecTrinkgeld.toFixed(2),
-          e.einnahme.toFixed(2)
+          e.summe.toFixed(2) + " €",
+          e.gegeben.toFixed(2) + " €",
+          e.rueckgeld.toFixed(2) + " €",
+          e.trinkgeld.toFixed(2) + " €",
+          e.ecZahlung.toFixed(2) + " €",
+          e.ecTrinkgeld.toFixed(2) + " €",
+          e.einnahme.toFixed(2) + " €"
         ])
       });
 
@@ -294,5 +296,3 @@
   </script>
 </body>
 </html>
-
-
