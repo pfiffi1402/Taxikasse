@@ -56,7 +56,6 @@
     .btn-reset { background: #dc3545; color: white; }
     .btn-edit { background: #ffc107; color: black; }
     .btn-save { background: #17a2b8; color: white; }
-
     .entry {
       border: 2px solid #007bff;
       padding: 12px;
@@ -84,22 +83,14 @@
 <body>
   <div class="container">
     <h2>📊 Taxi-Kasse</h2>
-    <label for="fahrername">Fahrername:</label>
-    <input type="text" id="fahrername" required oninput="saveFahrername()">
-    <label for="summe">Summe (€):</label>
-    <input type="number" id="summe" oninput="calculateRueckgeld()">
-    <label for="gegeben">Gegeben (€):</label>
-    <input type="number" id="gegeben" oninput="calculateRueckgeld()">
-    <label for="rueckgeld">Rückgeld (berechnet):</label>
-    <input type="number" id="rueckgeld" readonly>
-    <label for="rueckgeldTats">Rückgeld (tatsächlich):</label>
-    <input type="number" id="rueckgeldTats" oninput="calculateTrinkgeld()">
-    <label for="trinkgeld">Trinkgeld (€):</label>
-    <input type="number" id="trinkgeld" readonly>
-    <label for="ecZahlung">EC-Zahlung (€):</label>
-    <input type="number" id="ecZahlung">
-    <label for="ecTrinkgeld">Trinkgeld bei EC (€):</label>
-    <input type="number" id="ecTrinkgeld">
+    <input type="text" id="fahrername" placeholder="Fahrername" required oninput="saveFahrername()">
+    <input type="number" id="summe" placeholder="Summe (€)" oninput="calculateRueckgeld()">
+    <input type="number" id="gegeben" placeholder="Gegeben (€)" oninput="calculateRueckgeld()">
+    <input type="number" id="rueckgeld" placeholder="Rückgeld (berechnet)" readonly>
+    <input type="number" id="rueckgeldTats" placeholder="Rückgeld (tatsächlich)" oninput="calculateTrinkgeld()">
+    <input type="number" id="trinkgeld" placeholder="Trinkgeld (€)" readonly>
+    <input type="number" id="ecZahlung" placeholder="EC-Zahlung (€)">
+    <input type="number" id="ecTrinkgeld" placeholder="Trinkgeld bei EC (€)">
     <button class="btn-add" onclick="addEntry()">➕ Berechnen</button>
 
     <div id="output"></div>
@@ -303,5 +294,6 @@
   </script>
 </body>
 </html>
+
 
 
