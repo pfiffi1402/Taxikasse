@@ -265,7 +265,7 @@
       const yPos = pdf.lastAutoTable.finalY + 10;
 
       pdf.setFontSize(12);
-      pdf.text(`Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)} €`, 10, yPos);
+      pdf.text(`Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)} € (Bar: ${totalBar.toFixed(2)} €, EC: ${totalEC.toFixed(2)} €)`, 10, yPos);
       pdf.text(`Gesamt-Trinkgeld: ${totalTrinkgeld.toFixed(2)} €`, 10, yPos + 7);
 
       pdf.save(`Taxikasse-${fahrername}_${erstellungsdatum}.pdf`);
@@ -294,5 +294,3 @@
   </script>
 </body>
 </html>
-
-
