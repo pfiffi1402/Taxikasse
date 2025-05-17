@@ -52,6 +52,7 @@
     }
     .btn-add { background: #28a745; color: white; }
     .btn-export { background: #007bff; color: white; }
+    .btn-print { background: #6c757d; color: white; }
     .btn-share { background: #25D366; color: white; }
     .btn-reset { background: #dc3545; color: white; }
     .btn-edit { background: #ffc107; color: black; }
@@ -78,6 +79,20 @@
       padding: 10px;
       width: fit-content;
     }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printArea, #printArea * {
+        visibility: visible;
+      }
+      #printArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -97,9 +112,12 @@
 
     <hr>
     <button class="btn-export" onclick="exportPDF()">📄 PDF speichern</button>
+    <button class="btn-print" onclick="printEntries()">🖨️ Drucken</button>
     <button class="btn-share" onclick="shareWhatsApp()">📱 Teilen via WhatsApp</button>
     <button class="btn-reset" onclick="resetData()">🗑️ Alle Daten löschen</button>
   </div>
+
+  <div id="printArea" style="display:none;"></div>
 
   <script>
     let einnahmen = JSON.parse(localStorage.getItem("einnahmen")) || [];
@@ -181,6 +199,15 @@
         </div>`;
     }
 
+    function printEntries() {
+      const outputHTML = document.getElementById("output").innerHTML;
+      const printArea = document.getElementById("printArea");
+      printArea.innerHTML = `<h2>📊 Taxi-Kasse Druckansicht</h2>` + outputHTML;
+      printArea.style.display = "block";
+      window.print();
+      printArea.style.display = "none";
+    }
+
     function editEntry(index) {
       const entry = einnahmen[index];
       const container = document.getElementById(`entry-${index}`);
@@ -235,42 +262,6 @@
 
       localStorage.setItem("einnahmen", JSON.stringify(einnahmen));
       displayEntries();
-    }
-
-    function exportPDF() {
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
-      const fahrername = localStorage.getItem("fahrername") || "Unbekannt";
-      const erstellungsdatum = new Date().toLocaleDateString("de-DE");
-
-      pdf.setFont("helvetica", "normal");
-      pdf.text(`Taxi-Kasse - Fahrer: ${fahrername}`, 10, 10);
-      pdf.text(`Erstellungsdatum: ${erstellungsdatum}`, 10, 20);
-      pdf.autoTable({
-        startY: 30,
-        head: [["Datum", "Summe", "Gegeben", "Rückgeld", "Trinkgeld", "EC", "EC-Trinkgeld", "Einnahmen"]],
-        body: einnahmen.map(e => [
-          e.timestamp,
-          e.summe.toFixed(2) + " €",
-          e.gegeben.toFixed(2) + " €",
-          e.rueckgeld.toFixed(2) + " €",
-          e.trinkgeld.toFixed(2) + " €",
-          e.ecZahlung.toFixed(2) + " €",
-          e.ecTrinkgeld.toFixed(2) + " €",
-          e.einnahme.toFixed(2) + " €"
-        ])
-      });
-
-      const totalBar = einnahmen.reduce((a, e) => a + e.summe, 0);
-      const totalEC = einnahmen.reduce((a, e) => a + e.ecZahlung, 0);
-      const totalTrinkgeld = einnahmen.reduce((a, e) => a + e.trinkgeld + e.ecTrinkgeld, 0);
-      const yPos = pdf.lastAutoTable.finalY + 10;
-
-      pdf.setFontSize(12);
-      pdf.text(`Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)} €`, 10, yPos);
-      pdf.text(`Gesamt-Trinkgeld: ${totalTrinkgeld.toFixed(2)} €`, 10, yPos + 7);
-
-      pdf.save(`Taxikasse-${fahrername}_${erstellungsdatum}.pdf`);
     }
 
     function shareWhatsApp() {
