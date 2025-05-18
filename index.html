@@ -64,6 +64,14 @@
       background: #e9ecef;
       text-align: left;
     }
+    .entry-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+    .entry-line {
+      border-bottom: 1px solid #007bff;
+      margin-bottom: 8px;
+    }
     .summary-box {
       background: #d4edda;
       padding: 12px;
@@ -77,6 +85,12 @@
       border: 2px solid #ff00ee;
       padding: 10px;
       width: fit-content;
+      margin: 0 auto;
+    }
+    .rahmen-title {
+      font-weight: 700;
+      font-size: 1.1em;
+      margin-bottom: 8px;
     }
   </style>
 </head>
@@ -103,6 +117,26 @@
 
   <script>
     let einnahmen = JSON.parse(localStorage.getItem("einnahmen")) || [];
+
+    function parseGermanDate(dateString) {
+      const [day, month, year] = dateString.split(".");
+      return new Date(`${year}-${month}-${day}`);
+    }
+
+    function getDatumInfo() {
+      if (einnahmen.length === 1) {
+        return einnahmen[0].timestamp.split(",")[0];
+      } else if (einnahmen.length > 1) {
+        const sorted = [...einnahmen].sort((a, b) =>
+          parseGermanDate(a.timestamp.split(",")[0]) - parseGermanDate(b.timestamp.split(",")[0])
+        );
+        const firstDate = sorted[0].timestamp.split(",")[0];
+        const lastDate = sorted[sorted.length - 1].timestamp.split(",")[0];
+        return `von ${firstDate} bis ${lastDate}`;
+      } else {
+        return new Date().toLocaleDateString("de-DE");
+      }
+    }
 
     function saveFahrername() {
       const name = document.getElementById("fahrername").value.trim();
@@ -155,95 +189,52 @@
 
       let totalBar = 0, totalEC = 0, totalTrinkgeld = 0, totalECTrinkgeld = 0;
 
-      einnahmen.forEach((entry, index) => {
+      // Neueste Fahrten oben, Nummerierung absteigend
+      for(let i = 0; i < einnahmen.length; i++) {
+        const entry = einnahmen[i];
         totalBar += entry.summe;
         totalEC += entry.ecZahlung;
         totalTrinkgeld += entry.trinkgeld;
         totalECTrinkgeld += entry.ecTrinkgeld;
 
+        const nummer = einnahmen.length - i; // Absteigende Nummerierung
+
         output.innerHTML += `
-          <div class="entry" id="entry-${index}">
+          <div class="entry" id="entry-${i}">
+            <div class="entry-title">${nummer}. Fahrt</div>
+            <div class="entry-line"></div>
             📅 ${entry.timestamp}<br><hr>
             💵 Bar-Zahlung: ${entry.summe.toFixed(2)}€<br>
             💳 EC-Zahlung: ${entry.ecZahlung.toFixed(2)}€<br><hr>
             🎁 Trinkgeld (Bar): ${entry.trinkgeld.toFixed(2)}€<br>
             🎁 Trinkgeld (EC): ${entry.ecTrinkgeld.toFixed(2)}€<br>
-            <button class="btn-edit" onclick="editEntry(${index})">✏️ Bearbeiten</button>
+            <button class="btn-edit" onclick="editEntry(${i})">✏️ Bearbeiten</button>
           </div>`;
-      });
+      }
 
       output.innerHTML += `
         <div class="summary-box">
-          💵 Gesamt Bar: ${totalBar.toFixed(2)}€<br>
-          💳 Gesamt EC : ${totalEC.toFixed(2)}€<br><hr>
-          <center><div class="rahmen">📆 Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)}€<br><hr>
-          🎁 Gesamt Trinkgeld : ${(totalTrinkgeld + totalECTrinkgeld).toFixed(2)}€</div></center>
+          <center>
+            <div class="rahmen">
+              <div class="rahmen-title">Einnahmen aus: ${einnahmen.length} Fahrt${einnahmen.length === 1 ? '' : 'en'}</div>
+              <hr>
+              📆 Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)}€<br><hr>
+              💵 Gesamt Bar: ${totalBar.toFixed(2)}€<br>
+              💳 Gesamt EC : ${totalEC.toFixed(2)}€<br><hr>
+              🎁 Gesamt Trinkgeld: ${(totalTrinkgeld + totalECTrinkgeld).toFixed(2)}€
+            </div>
+          </center>
         </div>`;
-    }
-
-    function editEntry(index) {
-      const entry = einnahmen[index];
-      const container = document.getElementById(`entry-${index}`);
-      container.innerHTML = `
-        📅 ${entry.timestamp}<br><hr>
-        <label>Summe (€):</label>
-        <input type="number" id="edit-summe" value="${entry.summe}" oninput="updateRueckgeld(${index})"><br>
-        <label>Gegeben (€):</label>
-        <input type="number" id="edit-gegeben" value="${entry.gegeben}" oninput="updateRueckgeld(${index})"><br>
-        <label>Rückgeld (berechnet):</label>
-        <input type="number" id="edit-rueckgeld" value="${entry.rueckgeld}" readonly><br>
-        <label>Rückgeld (tatsächlich):</label>
-        <input type="number" id="edit-rueckgeldTats" value="${entry.rueckgeldTats}" oninput="updateTrinkgeld(${index})"><br>
-        <label>Trinkgeld (€):</label>
-        <input type="number" id="edit-trinkgeld" value="${entry.trinkgeld}" readonly><br>
-        <label>EC-Zahlung (€):</label>
-        <input type="number" id="edit-ecZahlung" value="${entry.ecZahlung}"><br>
-        <label>Trinkgeld bei EC (€):</label>
-        <input type="number" id="edit-ecTrinkgeld" value="${entry.ecTrinkgeld}"><br>
-        <button class="btn-save" onclick="saveEdit(${index})">💾 Speichern</button>`;
-    }
-
-    function updateRueckgeld(index) {
-      const summe = parseFloat(document.getElementById("edit-summe").value) || 0;
-      const gegeben = parseFloat(document.getElementById("edit-gegeben").value) || 0;
-      const rueckgeld = Math.max(gegeben - summe, 0);
-      document.getElementById("edit-rueckgeld").value = rueckgeld.toFixed(2);
-      updateTrinkgeld(index);
-    }
-
-    function updateTrinkgeld(index) {
-      const rueckgeld = parseFloat(document.getElementById("edit-rueckgeld").value) || 0;
-      const rueckgeldTats = parseFloat(document.getElementById("edit-rueckgeldTats").value) || 0;
-      const trinkgeld = Math.max(rueckgeld - rueckgeldTats, 0);
-      document.getElementById("edit-trinkgeld").value = trinkgeld.toFixed(2);
-    }
-
-    function saveEdit(index) {
-      const summe = parseFloat(document.getElementById("edit-summe").value) || 0;
-      const gegeben = parseFloat(document.getElementById("edit-gegeben").value) || 0;
-      const rueckgeld = parseFloat(document.getElementById("edit-rueckgeld").value) || 0;
-      const rueckgeldTats = parseFloat(document.getElementById("edit-rueckgeldTats").value) || 0;
-      const trinkgeld = parseFloat(document.getElementById("edit-trinkgeld").value) || 0;
-      const ecZahlung = parseFloat(document.getElementById("edit-ecZahlung").value) || 0;
-      const ecTrinkgeld = parseFloat(document.getElementById("edit-ecTrinkgeld").value) || 0;
-      const einnahme = summe + ecZahlung;
-
-      einnahmen[index] = {
-        ...einnahmen[index],
-        summe, gegeben, rueckgeld, rueckgeldTats, trinkgeld, ecZahlung, ecTrinkgeld, einnahme
-      };
-
-      localStorage.setItem("einnahmen", JSON.stringify(einnahmen));
-      displayEntries();
     }
 
     function exportPDF() {
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF();
       const fahrername = localStorage.getItem("fahrername") || "Unbekannt";
-      const erstellungsdatum = new Date().toLocaleDateString("de-DE");
+      const datumInfo = getDatumInfo();
+
       pdf.text(`Taxi-Kasse - Fahrer: ${fahrername}`, 10, 10);
-      pdf.text(`Erstellungsdatum: ${erstellungsdatum}`, 10, 20);
+      pdf.text(`Zeitraum: ${datumInfo}`, 10, 20);
       pdf.autoTable({
         startY: 30,
         head: [["Datum", "Summe", "Gegeben", "Rückgeld", "Trinkgeld", "EC", "EC-Trinkgeld", "Einnahmen"]],
@@ -268,16 +259,22 @@
       pdf.text(`Gesamteinnahmen: ${(totalBar + totalEC).toFixed(2)} € (Bar: ${totalBar.toFixed(2)} €, EC: ${totalEC.toFixed(2)} €)`, 10, yPos);
       pdf.text(`Gesamt-Trinkgeld: ${totalTrinkgeld.toFixed(2)} €`, 10, yPos + 7);
 
-      pdf.save(`Taxikasse-${fahrername}_${erstellungsdatum}.pdf`);
+      pdf.save(`Taxikasse-${fahrername}_${datumInfo.replace(/ /g, "_")}.pdf`);
     }
 
-    function shareWhatsApp() {
+function shareWhatsApp() {
       const totalBar = einnahmen.reduce((a, e) => a + e.summe, 0);
       const totalEC = einnahmen.reduce((a, e) => a + e.ecZahlung, 0);
       const totalTrinkgeld = einnahmen.reduce((a, e) => a + e.trinkgeld + e.ecTrinkgeld, 0);
       const gesamt = (totalBar + totalEC).toFixed(2);
-      const time = new Date().toLocaleString("de-DE");
-      const msg = `📅 ${time}\n📊 Gesamteinnahmen: ${gesamt}€\n💳 EC-Zahlungen: ${totalEC.toFixed(2)}€\n🎁 Trinkgeld: ${totalTrinkgeld.toFixed(2)}€`;
+      const datumInfo = getDatumInfo();
+
+      const msg = 
+        `📆 ${datumInfo}\n\n` +
+        `💵 Gesamt Bar: ${totalBar.toFixed(2)}€\n` +
+        `💳 Gesamt EC: ${totalEC.toFixed(2)}€\n` +
+        `📊 Gesamteinnahmen: ${gesamt}€\n`;
+
       window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
     }
 
@@ -291,6 +288,12 @@
       document.getElementById("fahrername").value = localStorage.getItem("fahrername") || "";
       displayEntries();
     };
+
+    function editEntry(index) {
+      // Optional: Implementieren, falls Bearbeitung gewünscht ist
+      alert('Bearbeiten für Eintrag ' + (index + 1) + ' noch nicht implementiert.');
+    }
   </script>
 </body>
 </html>
+    
